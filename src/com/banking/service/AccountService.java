@@ -5,6 +5,8 @@ import com.banking.util.JDBCUtil;
 
 import java.math.BigDecimal;
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AccountService {
     public void createAccount(String accountHolderName, BigDecimal initialBalance) {
@@ -40,5 +42,26 @@ public class AccountService {
         }
 
         return account;
+    }
+
+    public List<Account> getAllAccounts() {
+        List<Account> accounts = new ArrayList<>();
+        String sql = "SELECT * FROM Accounts";
+
+        try (Connection conn = JDBCUtil.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                Account account = new Account();
+                account.setAccountId(rs.getInt("account_id"));
+                account.setAccountHolderName(rs.getString("account_holder_name"));
+                account.setBalance(rs.getBigDecimal("balance"));
+                accounts.add(account);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return accounts;
     }
 }
